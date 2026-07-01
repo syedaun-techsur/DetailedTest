@@ -79,7 +79,7 @@ TaskFlow solves these problems by providing a persistent, shared task list that 
 - Filter tasks by status: All / To Do / In Progress / Done.
 - Tasks are sorted by creation date (newest first) by default.
 - Empty state message shown when no tasks exist or no tasks match the active filter.
-- Each task row links to the task detail/edit view.
+- Each task row's title links directly to the task edit form (`GET /tasks/:id/edit`), which serves as both the detail and edit view.
 
 **Priority:** P0 — Critical, MVP requirement
 
@@ -93,7 +93,7 @@ TaskFlow solves these problems by providing a persistent, shared task list that 
 - All fields editable: title, description, status (dropdown), due date.
 - Validation rules identical to task creation (title required; valid date if provided).
 - On successful save, user is returned to the task list with updated values reflected.
-- Editing is available from the task list (inline action or row click) or a dedicated task detail page.
+- Editing is available by clicking a task row from the task list (which navigates to `GET /tasks/:id/edit`) or via a dedicated Edit link/button.
 
 **Priority:** P0 — Critical, MVP requirement
 

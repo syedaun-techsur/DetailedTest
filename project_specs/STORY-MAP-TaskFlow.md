@@ -14,7 +14,7 @@
 | Product | TaskFlow — Shared Task Tracker |
 | Personas | PER-01 Marcus Webb (Team Member) · PER-02 Priya Nair (Team Lead) |
 | Total User Stories | 20 (US-0.1 – US-5.4) |
-| Releases Planned | R1: MVP Core (P0, 16 stories) · R2: UX Enhancement (P1, 4 stories) |
+| Releases Planned | v1 MVP (all 20 stories) — implemented in two increments: I1: Core CRUD (P0, 16 stories) · I2: Filtering & Bookmarking (P1, 4 stories) |
 | Map Coverage | 20/20 stories mapped · 0 orphans |
 
 ---
@@ -26,13 +26,13 @@ This Story Map organizes all 20 TaskFlow user stories into a two-dimensional gri
 - **X-axis (columns):** Journey stages drawn from JOURNEYS-TaskFlow.md — representing the sequential steps each persona takes to accomplish a job.
 - **Y-axis (rows):** Activities and user stories nested within each stage, grouped by epic.
 - **NaC column:** Natural Acceptance Criteria — testable criteria derived from the intersection of a JTBD outcome and a journey stage. NaC are *not invented*; each one traces directly back to a specific JTBD functional outcome applied to its journey context.
-- **Release column:** Increment assignment (R1 or R2) based on PRD priority and journey completeness.
+- **Release column:** Implementation increment assignment (I1 or I2) within the single v1 MVP release. I1 = P0 Core CRUD stories (built first); I2 = P1 Filtering stories (built second, ships in the same v1 release). Both increments are part of the MVP — this is sequencing, not separate deployments.
 
 ### How to Read the Map
 
 1. **Follow a persona row** across the journey columns to understand their end-to-end experience.
 2. **Read the NaC column** to understand what "done" looks like at each stage in JTBD terms.
-3. **Filter by Release** to identify what ships in R1 (MVP) vs. R2 (UX Enhancement).
+3. **Filter by Increment** to identify what is built in I1 (P0 Core CRUD) vs. I2 (P1 Filtering) — both ship as part of the v1 MVP.
 4. **Use the NaC Derivation Table** (Section 4) for full JTBD → journey stage → NaC traceability.
 
 ### NaC Concept
@@ -63,21 +63,21 @@ JTBD Outcome (the "what matters")
 
 Marcus's journeys: JRN-01.1 (Capture new task), JRN-01.2 (Morning orientation), JRN-01.3 (Progress & trust status update)
 
-| SM-ID | Journey Stage | Activity | Epic | Story | NaC (JTBD Source) | Release |
-|-------|--------------|----------|------|-------|-------------------|---------|
-| SM-0.1 | JRN-01.1: Navigate | Open TaskFlow in new tab, reach task list | Epic 0 (F0) | **US-0.1:** Create a New Task with a Title | JTBD-01.1 → "Task captured in ≤60 seconds": A "New Task" button is visible on the task list page so Marcus reaches the creation form in 1 click | R1 |
-| SM-0.2 | JRN-01.1: Create | Enter title; optionally add description, status, due date | Epic 0 (F0) | **US-0.2:** Create a Task with Optional Fields | JTBD-01.1 → "Only title required, optional fields do not block": Submitting with title only succeeds; description and due date may be omitted with no error | R1 |
-| SM-0.3 | JRN-01.1: Create | Submit form with incomplete or invalid input | Epic 0 (F0) | **US-0.3:** See Validation Errors on Invalid Task Creation | JTBD-01.1 → "Creation flow completes in 3 clicks or fewer": Inline errors appear without losing entered data so Marcus corrects and resubmits in one cycle | R1 |
-| SM-1.2 | JRN-01.1: Submit | Click task row to navigate to detail or edit | Epic 1 (F1) | **US-1.2:** Navigate from Task List to Detail/Edit View | JTBD-01.1 → "New task immediately visible": Each task row is a clickable link so Marcus can confirm or open a task in 1 click from the list | R1 |
-| SM-1.3 | JRN-01.1: Return / JRN-01.2: Orient | Open app for first time or see empty list | Epic 1 (F1) | **US-1.3:** See an Empty State When No Tasks Exist | JTBD-01.2 → "Page load feels instant, not confusing": A clear "No tasks yet" message is shown so Marcus knows the list is empty, not broken | R1 |
-| SM-1.1 | JRN-01.2: Arrive / Orient | Open task list to see all team work at a glance | Epic 1 (F1) | **US-1.1:** View All Tasks at a Glance | JTBD-01.2 → "Status of any active task readable within 10 seconds": Page loads within 2 seconds; each row shows title, status badge, due date, and description preview without opening the task | R1 |
-| SM-2.2 | JRN-01.3: Update Status / Save | Edit a task's fields and save | Epic 2 (F2) | **US-2.2:** Save Changes to a Task | JTBD-01.3 → "Status update in ≤2 clicks; changes survive restart": Submitting valid edits redirects to task list showing updated values; `updated_at` is stamped immediately | R1 |
-| SM-2.4 | JRN-01.3: Open Edit | Submit edit form with invalid data | Epic 2 (F2) | **US-2.4:** See Validation Errors on Invalid Task Edit | JTBD-01.3 → "Edit form pre-populated so only changed field needs updating": Re-renders with submitted values intact so Marcus fixes one field without re-entering others | R1 |
-| SM-3.1 | JRN-01.1: Return (cleanup) | Delete an erroneous or cancelled task | Epic 3 (F3) | **US-3.1:** Delete a Task with a Confirmation Step | JTBD-02.3 → "Delete with confirmation removes task permanently for all viewers": Confirmation dialog names the specific task; on confirm, task is permanently removed and list refreshes immediately | R1 |
-| SM-4.1 | JRN-01.3: Verify | Trust that tasks survive server restart | Epic 4 (F4) | **US-4.1:** Trust That Tasks Persist Across Server Restarts | JTBD-01.3 → "Zero data loss over 30 days": After server restart all previously created tasks are still returned on `GET /tasks`; no in-memory storage is used | R1 |
-| SM-4.3 | JRN-01.3: Save | Receive confirmation that a change was saved | Epic 4 (F4) | **US-4.3:** Receive Confirmation That My Changes Were Saved | JTBD-01.3 → "Changes written to DB immediately, survive restart": HTTP 302 redirect is not sent until DB write is fully confirmed; DB failure returns HTTP 500 | R1 |
-| SM-5.2 | JRN-01.2: Filter | See which filter is currently active | Epic 5 (F5) | **US-5.2:** See the Active Filter Visually Indicated | JTBD-01.2 → "Filter to In Progress in 1 click": Active filter is visually distinguished and driven by URL parameter so Marcus always knows if he is looking at a filtered subset | R2 |
-| SM-5.4 | JRN-01.2: Filter | See empty state when filter returns nothing | Epic 5 (F5) | **US-5.4:** See an Empty State When No Tasks Match the Active Filter | JTBD-02.2 → "Empty state shown clearly when filter returns no results": Descriptive message and filter controls remain visible so Marcus knows the filter is working, not broken | R2 |
+| SM-ID | Journey Stage | Activity | Epic | Story | NaC (JTBD Source) | Increment |
+|-------|--------------|----------|------|-------|-------------------|-----------|
+| SM-0.1 | JRN-01.1: Navigate | Open TaskFlow in new tab, reach task list | Epic 0 (F0) | **US-0.1:** Create a New Task with a Title | JTBD-01.1 → "Task captured in ≤60 seconds": A "New Task" button is visible on the task list page so Marcus reaches the creation form in 1 click | I1 |
+| SM-0.2 | JRN-01.1: Create | Enter title; optionally add description, status, due date | Epic 0 (F0) | **US-0.2:** Create a Task with Optional Fields | JTBD-01.1 → "Only title required, optional fields do not block": Submitting with title only succeeds; description and due date may be omitted with no error | I1 |
+| SM-0.3 | JRN-01.1: Create | Submit form with incomplete or invalid input | Epic 0 (F0) | **US-0.3:** See Validation Errors on Invalid Task Creation | JTBD-01.1 → "Creation flow completes in 3 clicks or fewer": Inline errors appear without losing entered data so Marcus corrects and resubmits in one cycle | I1 |
+| SM-1.2 | JRN-01.1: Submit | Click task row to navigate to detail or edit | Epic 1 (F1) | **US-1.2:** Navigate from Task List to Detail/Edit View | JTBD-01.1 → "New task immediately visible": Each task row is a clickable link so Marcus can confirm or open a task in 1 click from the list | I1 |
+| SM-1.3 | JRN-01.1: Return / JRN-01.2: Orient | Open app for first time or see empty list | Epic 1 (F1) | **US-1.3:** See an Empty State When No Tasks Exist | JTBD-01.2 → "Page load feels instant, not confusing": A clear "No tasks yet" message is shown so Marcus knows the list is empty, not broken | I1 |
+| SM-1.1 | JRN-01.2: Arrive / Orient | Open task list to see all team work at a glance | Epic 1 (F1) | **US-1.1:** View All Tasks at a Glance | JTBD-01.2 → "Status of any active task readable within 10 seconds": Page loads within 2 seconds; each row shows title, status badge, due date, and description preview without opening the task | I1 |
+| SM-2.2 | JRN-01.3: Update Status / Save | Edit a task's fields and save | Epic 2 (F2) | **US-2.2:** Save Changes to a Task | JTBD-01.3 → "Status update in ≤2 clicks; changes survive restart": Submitting valid edits redirects to task list showing updated values; `updated_at` is stamped immediately | I1 |
+| SM-2.4 | JRN-01.3: Open Edit | Submit edit form with invalid data | Epic 2 (F2) | **US-2.4:** See Validation Errors on Invalid Task Edit | JTBD-01.3 → "Edit form pre-populated so only changed field needs updating": Re-renders with submitted values intact so Marcus fixes one field without re-entering others | I1 |
+| SM-3.1 | JRN-01.1: Return (cleanup) | Delete an erroneous or cancelled task | Epic 3 (F3) | **US-3.1:** Delete a Task with a Confirmation Step | JTBD-02.3 → "Delete with confirmation removes task permanently for all viewers": Confirmation dialog names the specific task; on confirm, task is permanently removed and list refreshes immediately | I1 |
+| SM-4.1 | JRN-01.3: Verify | Trust that tasks survive server restart | Epic 4 (F4) | **US-4.1:** Trust That Tasks Persist Across Server Restarts | JTBD-01.3 → "Zero data loss over 30 days": After server restart all previously created tasks are still returned on `GET /tasks`; no in-memory storage is used | I1 |
+| SM-4.3 | JRN-01.3: Save | Receive confirmation that a change was saved | Epic 4 (F4) | **US-4.3:** Receive Confirmation That My Changes Were Saved | JTBD-01.3 → "Changes written to DB immediately, survive restart": HTTP 302 redirect is not sent until DB write is fully confirmed; DB failure returns HTTP 500 | I1 |
+| SM-5.2 | JRN-01.2: Filter | See which filter is currently active | Epic 5 (F5) | **US-5.2:** See the Active Filter Visually Indicated | JTBD-01.2 → "Filter to In Progress in 1 click": Active filter is visually distinguished and driven by URL parameter so Marcus always knows if he is looking at a filtered subset | I2 |
+| SM-5.4 | JRN-01.2: Filter | See empty state when filter returns nothing | Epic 5 (F5) | **US-5.4:** See an Empty State When No Tasks Match the Active Filter | JTBD-02.2 → "Empty state shown clearly when filter returns no results": Descriptive message and filter controls remain visible so Marcus knows the filter is working, not broken | I2 |
 
 ---
 
@@ -85,16 +85,16 @@ Marcus's journeys: JRN-01.1 (Capture new task), JRN-01.2 (Morning orientation), 
 
 Priya's journeys: JRN-02.1 (Daily team status review), JRN-02.2 (Identify stuck/overdue work), JRN-02.3 (Curate shared task list)
 
-| SM-ID | Journey Stage | Activity | Epic | Story | NaC (JTBD Source) | Release |
-|-------|--------------|----------|------|-------|-------------------|---------|
-| SM-1.1* | JRN-02.1: Scan / Assess | Scan all tasks with inline title, status, due date | Epic 1 (F1) | **US-1.1:** View All Tasks at a Glance | JTBD-02.1 → "Verbal status update producible in ≤2 minutes": Title, status, and due date all visible on each row without opening any task; page loads within 2 seconds | R1 |
-| SM-2.1 | JRN-02.1: Spot Risk / JRN-02.3: Edit Title | Open edit form for a task to update or correct it | Epic 2 (F2) | **US-2.1:** Open the Edit Form Pre-Populated with Current Task Values | JTBD-02.3 → "Any field editable by any team member; no permission prompt": Edit form at `GET /tasks/:id/edit` pre-populates all current values so Priya changes only the field that needs correcting | R1 |
-| SM-2.3 | JRN-02.3: Update Status | Change a task's status on behalf of a team member | Epic 2 (F2) | **US-2.3:** Update a Task's Status | JTBD-02.3 → "Status corrected on behalf of team member in ≤2 clicks": Selecting a new status and saving updates the badge immediately on the task list for all viewers | R1 |
-| SM-3.2 | JRN-02.3: Delete Stale Task | Cancel a deletion after clicking Delete by mistake | Epic 3 (F3) | **US-3.2:** Cancel a Deletion and Return to the Task List | JTBD-02.3 → "Confirmation dialog prevents accidental removal": Cancel option in the confirmation step returns Priya to `GET /tasks` with no changes; task remains intact | R1 |
-| SM-3.3 | JRN-02.3: Delete Stale Task | Encounter a task that was already deleted | Epic 3 (F3) | **US-3.3:** Handle Deletion of a Non-Existent Task | JTBD-02.3 → "Deleted tasks disappear immediately for all viewers": HTTP 404 with clear message so Priya understands the state without a confusing error page | R1 |
-| SM-4.2 | (Developer story — setup) | Run migration to create DB schema from scratch | Epic 4 (F4) | **US-4.2:** Set Up the Database Schema from Scratch | JTBD-01.3 / JTBD-02.3 → "Changes written to real DB, survive restart": Single migration command creates `tasks` table with all required columns and status CHECK constraint | R1 |
-| SM-5.1 | JRN-02.1: Arrive / JRN-02.2: Focus | Apply "In Progress" filter to isolate active work | Epic 5 (F5) | **US-5.1:** Filter the Task List by Status | JTBD-02.1 → "In Progress filter isolates active work in a single click": Clicking "In Progress" filter navigates to `/tasks?status=in_progress` returning only matching tasks | R2 |
-| SM-5.3 | JRN-02.1: Arrive / JRN-02.2: Focus | Bookmark filtered URL for daily use | Epic 5 (F5) | **US-5.3:** Bookmark or Share a Filtered Task List URL | JTBD-02.1 → "Bookmarked filter URL opens pre-filtered view instantly": `/tasks?status=in_progress` is bookmarkable; filter state is derived from URL parameter with no server session | R2 |
+| SM-ID | Journey Stage | Activity | Epic | Story | NaC (JTBD Source) | Increment |
+|-------|--------------|----------|------|-------|-------------------|-----------|
+| SM-1.1* | JRN-02.1: Scan / Assess | Scan all tasks with inline title, status, due date | Epic 1 (F1) | **US-1.1:** View All Tasks at a Glance | JTBD-02.1 → "Verbal status update producible in ≤2 minutes": Title, status, and due date all visible on each row without opening any task; page loads within 2 seconds | I1 |
+| SM-2.1 | JRN-02.1: Spot Risk / JRN-02.3: Edit Title | Open edit form for a task to update or correct it | Epic 2 (F2) | **US-2.1:** Open the Edit Form Pre-Populated with Current Task Values | JTBD-02.3 → "Any field editable by any team member; no permission prompt": Edit form at `GET /tasks/:id/edit` pre-populates all current values so Priya changes only the field that needs correcting | I1 |
+| SM-2.3 | JRN-02.3: Update Status | Change a task's status on behalf of a team member | Epic 2 (F2) | **US-2.3:** Update a Task's Status | JTBD-02.3 → "Status corrected on behalf of team member in ≤2 clicks": Selecting a new status and saving updates the badge immediately on the task list for all viewers | I1 |
+| SM-3.2 | JRN-02.3: Delete Stale Task | Cancel a deletion after clicking Delete by mistake | Epic 3 (F3) | **US-3.2:** Cancel a Deletion and Return to the Task List | JTBD-02.3 → "Confirmation dialog prevents accidental removal": Cancel option in the confirmation step returns Priya to `GET /tasks` with no changes; task remains intact | I1 |
+| SM-3.3 | JRN-02.3: Delete Stale Task | Encounter a task that was already deleted | Epic 3 (F3) | **US-3.3:** Handle Deletion of a Non-Existent Task | JTBD-02.3 → "Deleted tasks disappear immediately for all viewers": HTTP 404 with clear message so Priya understands the state without a confusing error page | I1 |
+| SM-4.2 | (Developer story — setup) | Run migration to create DB schema from scratch | Epic 4 (F4) | **US-4.2:** Set Up the Database Schema from Scratch | JTBD-01.3 / JTBD-02.3 → "Changes written to real DB, survive restart": Single migration command creates `tasks` table with all required columns and status CHECK constraint | I1 |
+| SM-5.1 | JRN-02.1: Arrive / JRN-02.2: Focus | Apply "In Progress" filter to isolate active work | Epic 5 (F5) | **US-5.1:** Filter the Task List by Status | JTBD-02.1 → "In Progress filter isolates active work in a single click": Clicking "In Progress" filter navigates to `/tasks?status=in_progress` returning only matching tasks | I2 |
+| SM-5.3 | JRN-02.1: Arrive / JRN-02.2: Focus | Bookmark filtered URL for daily use | Epic 5 (F5) | **US-5.3:** Bookmark or Share a Filtered Task List URL | JTBD-02.1 → "Bookmarked filter URL opens pre-filtered view instantly": `/tasks?status=in_progress` is bookmarkable; filter state is derived from URL parameter with no server session | I2 |
 
 > *SM-1.1 appears in both persona sections because US-1.1 (View All Tasks) is primary for both PER-01 and PER-02 and maps to multiple journeys.
 
@@ -102,28 +102,28 @@ Priya's journeys: JRN-02.1 (Daily team status review), JRN-02.2 (Identify stuck/
 
 ### Complete Story Placement Index
 
-| SM-ID | US-ID | Persona(s) | Journey(s) | Stage(s) | Release |
-|-------|-------|-----------|------------|----------|---------|
-| SM-0.1 | US-0.1 | PER-01 | JRN-01.1 | Navigate → Create | R1 |
-| SM-0.2 | US-0.2 | PER-01 | JRN-01.1 | Create | R1 |
-| SM-0.3 | US-0.3 | PER-01 | JRN-01.1 | Create | R1 |
-| SM-1.1 | US-1.1 | PER-01, PER-02 | JRN-01.2, JRN-02.1 | Arrive, Orient, Scan, Assess | R1 |
-| SM-1.2 | US-1.2 | PER-01 | JRN-01.1, JRN-01.3 | Submit, Open Edit | R1 |
-| SM-1.3 | US-1.3 | PER-01 | JRN-01.1, JRN-01.2 | Return, Orient | R1 |
-| SM-2.1 | US-2.1 | PER-02 | JRN-02.1, JRN-02.3 | Spot Risk, Edit Title | R1 |
-| SM-2.2 | US-2.2 | PER-01 | JRN-01.3 | Update Status, Save | R1 |
-| SM-2.3 | US-2.3 | PER-02 | JRN-02.3 | Update Status | R1 |
-| SM-2.4 | US-2.4 | PER-01 | JRN-01.3 | Open Edit | R1 |
-| SM-3.1 | US-3.1 | PER-01 | JRN-01.1 | Return (cleanup) | R1 |
-| SM-3.2 | US-3.2 | PER-02 | JRN-02.3 | Delete Stale Task | R1 |
-| SM-3.3 | US-3.3 | PER-02 | JRN-02.3 | Delete Stale Task | R1 |
-| SM-4.1 | US-4.1 | PER-01 | JRN-01.3 | Verify | R1 |
-| SM-4.2 | US-4.2 | Developer | (setup) | — | R1 |
-| SM-4.3 | US-4.3 | PER-01 | JRN-01.3 | Save | R1 |
-| SM-5.1 | US-5.1 | PER-02 | JRN-02.1, JRN-02.2 | Arrive, Focus | R2 |
-| SM-5.2 | US-5.2 | PER-01 | JRN-01.2 | Filter | R2 |
-| SM-5.3 | US-5.3 | PER-02 | JRN-02.1, JRN-02.2 | Arrive, Focus | R2 |
-| SM-5.4 | US-5.4 | PER-01 | JRN-01.2 | Filter | R2 |
+| SM-ID | US-ID | Persona(s) | Journey(s) | Stage(s) | Increment |
+|-------|-------|-----------|------------|----------|-----------|
+| SM-0.1 | US-0.1 | PER-01 | JRN-01.1 | Navigate → Create | I1 |
+| SM-0.2 | US-0.2 | PER-01 | JRN-01.1 | Create | I1 |
+| SM-0.3 | US-0.3 | PER-01 | JRN-01.1 | Create | I1 |
+| SM-1.1 | US-1.1 | PER-01, PER-02 | JRN-01.2, JRN-02.1 | Arrive, Orient, Scan, Assess | I1 |
+| SM-1.2 | US-1.2 | PER-01 | JRN-01.1, JRN-01.3 | Submit, Open Edit | I1 |
+| SM-1.3 | US-1.3 | PER-01 | JRN-01.1, JRN-01.2 | Return, Orient | I1 |
+| SM-2.1 | US-2.1 | PER-02 | JRN-02.1, JRN-02.3 | Spot Risk, Edit Title | I1 |
+| SM-2.2 | US-2.2 | PER-01 | JRN-01.3 | Update Status, Save | I1 |
+| SM-2.3 | US-2.3 | PER-02 | JRN-02.3 | Update Status | I1 |
+| SM-2.4 | US-2.4 | PER-01 | JRN-01.3 | Open Edit | I1 |
+| SM-3.1 | US-3.1 | PER-01 | JRN-01.1 | Return (cleanup) | I1 |
+| SM-3.2 | US-3.2 | PER-02 | JRN-02.3 | Delete Stale Task | I1 |
+| SM-3.3 | US-3.3 | PER-02 | JRN-02.3 | Delete Stale Task | I1 |
+| SM-4.1 | US-4.1 | PER-01 | JRN-01.3 | Verify | I1 |
+| SM-4.2 | US-4.2 | Developer | (setup) | — | I1 |
+| SM-4.3 | US-4.3 | PER-01 | JRN-01.3 | Save | I1 |
+| SM-5.1 | US-5.1 | PER-02 | JRN-02.1, JRN-02.2 | Arrive, Focus | I2 |
+| SM-5.2 | US-5.2 | PER-01 | JRN-01.2 | Filter | I2 |
+| SM-5.3 | US-5.3 | PER-02 | JRN-02.1, JRN-02.2 | Arrive, Focus | I2 |
+| SM-5.4 | US-5.4 | PER-01 | JRN-01.2 | Filter | I2 |
 
 **Total mapped: 20/20 stories. Orphans: 0.**
 
@@ -197,16 +197,17 @@ This table confirms that each NaC is supported by the corresponding UserStory's 
 
 ---
 
-### R1: "MVP Core — Complete CRUD Journey" (P0 Stories)
+### I1: "Core CRUD Foundation" (P0 Stories) — ships as part of v1 MVP
 
-**Theme:** Deliver a fully functional shared task tracker that enables both Marcus and Priya to complete their end-to-end journeys from first use to daily habit. Every P0 story ships in R1 so no journey is left half-complete.
+**Theme:** Deliver a fully functional shared task tracker that enables both Marcus and Priya to complete their end-to-end journeys from first use to daily habit. Every P0 story is implemented in I1 so no journey is left half-complete.
 
-**Release Rationale:** All 16 P0 stories are grouped into R1 because:
+**Rationale:** All 16 P0 stories are grouped into I1 because:
 1. They form a complete journey dependency chain (create → view → edit → delete → persist).
 2. No journey can be completed without the full CRUD foundation.
-3. Filtering (F5, R2) enhances but does not block the core workflows — both personas can use the unfiltered list while R2 is in progress.
+3. Filtering (F5, I2) enhances but does not block the core workflows — both personas can use the unfiltered list while I2 is in progress.
+4. Both I1 and I2 ship together as the v1 MVP; I2 stories are not deferred to a future release.
 
-**Stories in R1:**
+**Stories in I1:**
 
 | SM-ID | US-ID | Story Title | Epic | Feature | Persona(s) | Journey Stage(s) |
 |-------|-------|-------------|------|---------|-----------|-----------------|
@@ -229,43 +230,44 @@ This table confirms that each NaC is supported by the corresponding UserStory's 
 
 **Story Count:** 16 P0 stories
 
-**Personas Served in R1:**
+**Personas Served in I1:**
 - ✅ PER-01 Marcus Webb — all 3 journeys (JRN-01.1, JRN-01.2, JRN-01.3) fully completable
-- ✅ PER-02 Priya Nair — all 3 journeys (JRN-02.1, JRN-02.2, JRN-02.3) fully completable (with full list only; filter bookmarking deferred to R2)
-- ✅ Developer — DB setup story included to unblock all other R1 stories
+- ✅ PER-02 Priya Nair — all 3 journeys (JRN-02.1, JRN-02.2, JRN-02.3) fully completable (with full list only; filter bookmarking completed in I2 of the same v1 release)
+- ✅ Developer — DB setup story included to unblock all other I1 stories
 
-**JTBD Addressed in R1:**
+**JTBD Addressed in I1:**
 - ✅ JTBD-01.1 — Capture new work immediately (US-0.1, US-0.2, US-0.3)
-- ✅ JTBD-01.2 — Understand team work state without interrupting teammates (US-1.1, US-1.3 — full view; filter enhancement in R2)
+- ✅ JTBD-01.2 — Understand team work state without interrupting teammates (US-1.1, US-1.3 — full view; filter enhancement in I2)
 - ✅ JTBD-01.3 — Progress a task and trust it will persist (US-2.2, US-2.4, US-4.1, US-4.3)
-- ✅ JTBD-02.1 — Build accurate team status picture (US-1.1 — full list scan; filter shortcut in R2)
-- ⚠️ JTBD-02.2 — Identify stuck/overdue work at a glance (partial: due date visible in US-1.1 but no In Progress filter in R1 — filter deferred to R2)
+- ✅ JTBD-02.1 — Build accurate team status picture (US-1.1 — full list scan; filter shortcut in I2)
+- ⚠️ JTBD-02.2 — Identify stuck/overdue work at a glance (partial: due date visible in US-1.1 but no In Progress filter until I2)
 - ✅ JTBD-02.3 — Keep shared list clean and authoritative (US-2.1, US-2.3, US-3.1, US-3.2, US-3.3)
 
-**R1 Journey Completeness:**
+**I1 Journey Completeness:**
 
-| Journey | Complete in R1? | Notes |
+| Journey | Complete in I1? | Notes |
 |---------|----------------|-------|
 | JRN-01.1: Capture a new task | ✅ Full | Create → Submit → See in list → Persist |
-| JRN-01.2: Morning orientation | ⚠️ Mostly | View all tasks (US-1.1) works; manual scan only — In Progress filter deferred to R2 |
+| JRN-01.2: Morning orientation | ⚠️ Mostly | View all tasks (US-1.1) works; manual scan only — In Progress filter added in I2 |
 | JRN-01.3: Progress a status update | ✅ Full | Find → Open Edit (pre-populated) → Save → Verify on list |
-| JRN-02.1: Daily team status review | ⚠️ Mostly | Full list view works; bookmarked filter URL deferred to R2 |
-| JRN-02.2: Identify stuck/overdue work | ⚠️ Mostly | Due date visible on rows; In Progress filter for triage deferred to R2 |
+| JRN-02.1: Daily team status review | ⚠️ Mostly | Full list view works; bookmarked filter URL added in I2 |
+| JRN-02.2: Identify stuck/overdue work | ⚠️ Mostly | Due date visible on rows; In Progress filter for triage added in I2 |
 | JRN-02.3: Curate shared task list | ✅ Full | Edit title → Update status → Delete → Verify clean list |
 
 ---
 ---
 
-### R2: "UX Enhancement — Filtering & Bookmarkability" (P1 Stories)
+### I2: "Filtering & Bookmarkability" (P1 Stories) — ships as part of v1 MVP
 
-**Theme:** Add status filtering with bookmarkable URLs to complete Priya's daily status review workflow and reduce Marcus's morning orientation to a single bookmarked click. R2 stories all depend on R1's task list foundation (F1) being in place.
+**Theme:** Add status filtering with bookmarkable URLs to complete Priya's daily status review workflow and reduce Marcus's morning orientation to a single bookmarked click. I2 stories all depend on I1's task list foundation (F1) being in place. Both I1 and I2 ship together as the v1 MVP.
 
-**Release Rationale:** F5 stories are P1 because:
-1. The core CRUD journeys (R1) are fully functional without filtering — users can scroll the full list.
+**Rationale:** F5 stories are implemented second (I2) because:
+1. The core CRUD journeys (I1) are fully functional without filtering — users can scroll the full list.
 2. Filtering significantly improves Priya's daily habit (bookmarked "In Progress" URL) and removes noise for Marcus's morning scan.
-3. All 4 F5 stories are tightly coupled (filter UI → active indicator → bookmarkable URL → empty state) and ship together as a coherent unit.
+3. All 4 F5 stories are tightly coupled (filter UI → active indicator → bookmarkable URL → empty state) and are implemented together as a coherent unit.
+4. F5 is P1 (ships with MVP per PRD §9) — this is an implementation sequencing decision, not a deferral to a post-MVP release.
 
-**Stories in R2:**
+**Stories in I2:**
 
 | SM-ID | US-ID | Story Title | Epic | Feature | Persona(s) | Journey Stage(s) |
 |-------|-------|-------------|------|---------|-----------|-----------------|
@@ -276,26 +278,26 @@ This table confirms that each NaC is supported by the corresponding UserStory's 
 
 **Story Count:** 4 P1 stories
 
-**Dependencies:** All R2 stories depend on US-1.1 (Task List) and US-1.3 (Empty State) from R1 being complete and stable.
+**Dependencies:** All I2 stories depend on US-1.1 (Task List) and US-1.3 (Empty State) from I1 being complete and stable.
 
-**Personas Served in R2:**
+**Personas Served in I2:**
 - ✅ PER-01 Marcus Webb — completes JRN-01.2 (Morning orientation with filter + visual indicator + empty state clarity)
 - ✅ PER-02 Priya Nair — completes JRN-02.1 (Bookmarked "In Progress" URL as daily status view) and JRN-02.2 (Filtered overdue task identification)
 
-**JTBD Addressed in R2 (completing what R1 started):**
+**JTBD Addressed in I2 (completing what I1 started):**
 - ✅ JTBD-01.2 — "Filter to In Progress in 1 click; bookmarkable URL reduces setup to 0 clicks" (US-5.2, US-5.4 complete this job)
 - ✅ JTBD-02.1 — "Bookmarked filter URL opens pre-filtered In Progress view instantly" (US-5.1, US-5.3 complete this job)
-- ✅ JTBD-02.2 — "Identify overdue In Progress tasks within 60 seconds via filtered view" (US-5.1, US-5.3 complete this job; due dates already visible from R1)
+- ✅ JTBD-02.2 — "Identify overdue In Progress tasks within 60 seconds via filtered view" (US-5.1, US-5.3 complete this job; due dates already visible from I1)
 
-**R2 Journey Completeness:**
+**I2 Journey Completeness:**
 
-| Journey | Complete after R2? | What R2 Adds |
+| Journey | Complete after I2? | What I2 Adds |
 |---------|-------------------|--------------|
 | JRN-01.2: Morning orientation | ✅ Full | Filter tab (US-5.1), active indicator (US-5.2), empty state on filter (US-5.4) |
 | JRN-02.1: Daily team status review | ✅ Full | Filter to "In Progress" in 1 click (US-5.1); bookmarkable URL (US-5.3) |
 | JRN-02.2: Identify stuck/overdue work | ✅ Full | "In Progress" filter isolates at-risk tasks for Priya's triage scan (US-5.1, US-5.3) |
 
-**R2 Out-of-Scope Candidates (Deferred to v2+):**
+**I2 Out-of-Scope Candidates (Deferred to v2+):**
 
 The following items surfaced in JOURNEYS analysis as valued but are not in scope for either R1 or R2:
 
@@ -316,67 +318,67 @@ The following items surfaced in JOURNEYS analysis as valued but are not in scope
 
 ### Persona Coverage by Release
 
-| Persona | R1 Coverage | R2 Coverage | Fully Served After |
+| Persona | I1 Coverage | I2 Coverage | Fully Served After |
 |---------|------------|------------|-------------------|
-| PER-01 Marcus Webb | JRN-01.1 ✅ Full · JRN-01.2 ⚠️ Partial (no filter) · JRN-01.3 ✅ Full | JRN-01.2 ✅ Complete | R2 |
-| PER-02 Priya Nair | JRN-02.1 ⚠️ Partial (no bookmark filter) · JRN-02.2 ⚠️ Partial (no filter) · JRN-02.3 ✅ Full | JRN-02.1 ✅ · JRN-02.2 ✅ Complete | R2 |
-| Developer | US-4.2 ✅ (DB setup) | — | R1 |
+| PER-01 Marcus Webb | JRN-01.1 ✅ Full · JRN-01.2 ⚠️ Partial (no filter) · JRN-01.3 ✅ Full | JRN-01.2 ✅ Complete | I2 (v1 MVP) |
+| PER-02 Priya Nair | JRN-02.1 ⚠️ Partial (no bookmark filter) · JRN-02.2 ⚠️ Partial (no filter) · JRN-02.3 ✅ Full | JRN-02.1 ✅ · JRN-02.2 ✅ Complete | I2 (v1 MVP) |
+| Developer | US-4.2 ✅ (DB setup) | — | I1 (v1 MVP) |
 
-**R1 alone:** Both personas can use TaskFlow for daily work. Filtering is absent but not blocking — full list scrolling serves both journeys.
-**R2 complete:** All journeys fully served. Priya's bookmark habit and Marcus's focused morning scan are both enabled.
+**I1 alone:** Both personas can use TaskFlow for daily work. Filtering is absent but not blocking — full list scrolling serves both journeys.
+**I2 complete (full v1 MVP):** All journeys fully served. Priya's bookmark habit and Marcus's focused morning scan are both enabled.
 
 ---
 
 ### JTBD Coverage by Release
 
-| JTBD-ID | Job (abbreviated) | R1 Coverage | R2 Coverage | First Complete |
+| JTBD-ID | Job (abbreviated) | I1 Coverage | I2 Coverage | First Complete |
 |---------|------------------|------------|------------|---------------|
-| JTBD-01.1 | Capture new work immediately | ✅ US-0.1, US-0.2, US-0.3 | — | R1 |
-| JTBD-01.2 | Understand team work state without interrupting | ⚠️ US-1.1 (list view only) | ✅ US-5.2, US-5.4 | R2 |
-| JTBD-01.3 | Progress a task and trust it will persist | ✅ US-2.2, US-2.4, US-4.1, US-4.3 | — | R1 |
-| JTBD-02.1 | Build accurate team status picture | ⚠️ US-1.1 (full list only) | ✅ US-5.1, US-5.3 | R2 |
-| JTBD-02.2 | Identify stuck/overdue work at a glance | ⚠️ US-1.1 (due date visible, no filter) | ✅ US-5.1, US-5.3, US-5.4 | R2 |
-| JTBD-02.3 | Keep shared list clean and authoritative | ✅ US-2.1, US-2.3, US-3.1, US-3.2, US-3.3 | — | R1 |
+| JTBD-01.1 | Capture new work immediately | ✅ US-0.1, US-0.2, US-0.3 | — | I1 (v1 MVP) |
+| JTBD-01.2 | Understand team work state without interrupting | ⚠️ US-1.1 (list view only) | ✅ US-5.2, US-5.4 | I2 (v1 MVP) |
+| JTBD-01.3 | Progress a task and trust it will persist | ✅ US-2.2, US-2.4, US-4.1, US-4.3 | — | I1 (v1 MVP) |
+| JTBD-02.1 | Build accurate team status picture | ⚠️ US-1.1 (full list only) | ✅ US-5.1, US-5.3 | I2 (v1 MVP) |
+| JTBD-02.2 | Identify stuck/overdue work at a glance | ⚠️ US-1.1 (due date visible, no filter) | ✅ US-5.1, US-5.3, US-5.4 | I2 (v1 MVP) |
+| JTBD-02.3 | Keep shared list clean and authoritative | ✅ US-2.1, US-2.3, US-3.1, US-3.2, US-3.3 | — | I1 (v1 MVP) |
 
-**4 of 6 JTBD fully addressed in R1.** JTBD-01.2 and JTBD-02.1/02.2 are partially addressed in R1 and completed in R2.
+**4 of 6 JTBD fully addressed in I1.** JTBD-01.2 and JTBD-02.1/02.2 are partially addressed in I1 and completed in I2. All 6 JTBD are fully addressed within the v1 MVP.
 
 ---
 
 ### Journey Stage Coverage
 
-| Journey | Stage | Covered By | Release |
-|---------|-------|------------|---------|
+| Journey | Stage | Covered By | Increment |
+|---------|-------|------------|-----------|
 | JRN-01.1 | Triggered | (external — Slack; no story needed) | — |
-| JRN-01.1 | Navigate | US-0.1 (New Task button visible) | R1 |
-| JRN-01.1 | Create | US-0.1, US-0.2, US-0.3 | R1 |
-| JRN-01.1 | Submit | US-0.1, US-1.2, US-4.3 | R1 |
-| JRN-01.1 | Return | US-4.1 (persistence trust), US-3.1 (cleanup) | R1 |
-| JRN-01.2 | Arrive | US-1.1 | R1 |
-| JRN-01.2 | Orient | US-1.1, US-1.3 | R1 |
-| JRN-01.2 | Filter | US-5.2, US-5.4 | R2 |
-| JRN-01.2 | Scan | US-1.1 | R1 |
-| JRN-01.2 | Complete | (mental task; no story — covered by R1 list) | — |
-| JRN-01.3 | Identify | US-1.1 (task list scan) | R1 |
-| JRN-01.3 | Open Edit | US-2.1, US-2.4, US-1.2 | R1 |
-| JRN-01.3 | Update Status | US-2.2, US-2.3 | R1 |
-| JRN-01.3 | Save | US-2.2, US-4.3 | R1 |
-| JRN-01.3 | Verify | US-1.1, US-4.1 | R1 |
-| JRN-02.1 | Arrive | US-5.3 (bookmark) | R2 |
-| JRN-02.1 | Scan | US-1.1 | R1 |
-| JRN-02.1 | Spot Risk | US-1.1 (due date visible on row) | R1 |
-| JRN-02.1 | Assess | US-1.1 | R1 |
+| JRN-01.1 | Navigate | US-0.1 (New Task button visible) | I1 |
+| JRN-01.1 | Create | US-0.1, US-0.2, US-0.3 | I1 |
+| JRN-01.1 | Submit | US-0.1, US-1.2, US-4.3 | I1 |
+| JRN-01.1 | Return | US-4.1 (persistence trust), US-3.1 (cleanup) | I1 |
+| JRN-01.2 | Arrive | US-1.1 | I1 |
+| JRN-01.2 | Orient | US-1.1, US-1.3 | I1 |
+| JRN-01.2 | Filter | US-5.2, US-5.4 | I2 |
+| JRN-01.2 | Scan | US-1.1 | I1 |
+| JRN-01.2 | Complete | (mental task; no story — covered by I1 list) | — |
+| JRN-01.3 | Identify | US-1.1 (task list scan) | I1 |
+| JRN-01.3 | Open Edit | US-2.1, US-2.4, US-1.2 | I1 |
+| JRN-01.3 | Update Status | US-2.2, US-2.3 | I1 |
+| JRN-01.3 | Save | US-2.2, US-4.3 | I1 |
+| JRN-01.3 | Verify | US-1.1, US-4.1 | I1 |
+| JRN-02.1 | Arrive | US-5.3 (bookmark) | I2 |
+| JRN-02.1 | Scan | US-1.1 | I1 |
+| JRN-02.1 | Spot Risk | US-1.1 (due date visible on row) | I1 |
+| JRN-02.1 | Assess | US-1.1 | I1 |
 | JRN-02.1 | Prepare | (mental task; no story needed) | — |
 | JRN-02.1 | Act | (external — Slack; no story needed) | — |
-| JRN-02.2 | Focus | US-5.1, US-5.3 | R2 |
-| JRN-02.2 | Scan Due Dates | US-1.1 (due date column), US-5.4 (empty state) | R1/R2 |
-| JRN-02.2 | Identify Overdue | US-5.1 (filter active), US-1.1 | R1/R2 |
-| JRN-02.2 | Validate | US-2.1 (open edit to read description) | R1 |
-| JRN-02.2 | Follow Up | US-1.1 (task list reference) | R1 |
-| JRN-02.3 | Survey | US-1.1 (all tasks view) | R1 |
-| JRN-02.3 | Edit Title | US-2.1, US-2.2 | R1 |
-| JRN-02.3 | Update Status | US-2.3 | R1 |
-| JRN-02.3 | Delete Stale Task | US-3.1, US-3.2, US-3.3 | R1 |
-| JRN-02.3 | Verify Clean List | US-1.1, US-4.1 | R1 |
+| JRN-02.2 | Focus | US-5.1, US-5.3 | I2 |
+| JRN-02.2 | Scan Due Dates | US-1.1 (due date column), US-5.4 (empty state) | I1/I2 |
+| JRN-02.2 | Identify Overdue | US-5.1 (filter active), US-1.1 | I1/I2 |
+| JRN-02.2 | Validate | US-2.1 (open edit to read description) | I1 |
+| JRN-02.2 | Follow Up | US-1.1 (task list reference) | I1 |
+| JRN-02.3 | Survey | US-1.1 (all tasks view) | I1 |
+| JRN-02.3 | Edit Title | US-2.1, US-2.2 | I1 |
+| JRN-02.3 | Update Status | US-2.3 | I1 |
+| JRN-02.3 | Delete Stale Task | US-3.1, US-3.2, US-3.3 | I1 |
+| JRN-02.3 | Verify Clean List | US-1.1, US-4.1 | I1 |
 
 **4 stages marked as external or mental tasks (no story required):**
 - JRN-01.1: Triggered (Marcus reads Slack — external)

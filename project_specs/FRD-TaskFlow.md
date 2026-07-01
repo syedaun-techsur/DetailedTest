@@ -55,7 +55,7 @@ Authentication, multi-tenancy, real-time updates, file attachments, and task ass
 - **Status slug:** The URL-safe, lowercase version of a status value used in query parameters: `todo`, `in_progress`, `done`.
 - **Due Date:** An optional calendar date (no time) by which a task is intended to be completed.
 - **Task List:** The primary view — a server-rendered page showing all tasks in the shared workspace, optionally filtered by status.
-- **Task Detail / Edit View:** A server-rendered page showing a single task's full details and providing an edit form.
+- **Task Edit View:** A server-rendered page at `GET /tasks/:id/edit` showing a single task's full details pre-populated in an edit form. This is the combined task detail and edit surface in v1 — there is no separate read-only detail page.
 - **Confirmation Step:** A user-facing dialog or dedicated page that asks the user to explicitly confirm a destructive action (deletion) before it is executed.
 - **ORM:** Object-Relational Mapper. TaskFlow uses Sequelize (Node.js) or Django ORM (Python) to issue parameterized queries; raw SQL is not used directly.
 - **Migration:** A versioned, repeatable script that creates or alters the database schema. Required for initial setup and future schema changes.
@@ -147,7 +147,7 @@ Authentication, multi-tenancy, real-time updates, file attachments, and task ass
 ### Validation Rules
 
 - `title`: Must not be empty or whitespace-only after trimming. Maximum 255 characters. Violation → error message: `"Title is required."` / `"Title must be 255 characters or fewer."`
-- `status`: If provided, must be exactly one of: `To Do`, `In Progress`, `Done`. If missing or invalid, silently default to `To Do` (no error shown to user).
+- `status`: If provided, must be exactly one of: `To Do`, `In Progress`, `Done`. If missing or invalid, silently default to `To Do` (no error shown to user). **Design rationale:** On creation the form pre-selects `To Do` but a missing value (e.g., JavaScript disabling the dropdown) is a benign edge case; defaulting is better UX than blocking creation. Contrast with F02 (edit), where the form always pre-populates the current stored status — a missing/invalid value on edit indicates a form submission problem and should surface as a validation error rather than silently overwriting the existing status.
 - `due_date`: If provided, must be a valid calendar date in `YYYY-MM-DD` format. Must not be a non-existent date (e.g., `2026-02-30`). Violation → error message: `"Due date must be a valid date (YYYY-MM-DD)."`
 - `description`: No validation constraints beyond storage (TEXT). Accepted as-is.
 
@@ -219,7 +219,7 @@ Full DDL: see `Y0-schema.md` §tasks table.
 3. Server queries the `tasks` table: `SELECT * FROM tasks [WHERE status = ?] ORDER BY created_at DESC`.
 4. If zero tasks match, server renders the empty state message (see §Empty State below).
 5. If one or more tasks match, server renders each task as a task row.
-6. Each task row displays: title (as a link to `GET /tasks/:id`), status badge, due date formatted as `MMM DD, YYYY` (e.g., `Jul 15, 2026`) or blank if NULL, description preview (first 100 chars + `…` if longer, or blank if NULL).
+6. Each task row displays: title (as a link to `GET /tasks/:id/edit`), status badge, due date formatted as `MMM DD, YYYY` (e.g., `Jul 15, 2026`) or blank if NULL, description preview (first 100 chars + `…` if longer, or blank if NULL).
 7. Filter controls are rendered above the list (see F05 §Process for filter rendering details).
 8. A "New Task" button or link to `GET /tasks/new` is rendered prominently on the page.
 9. Server returns HTTP 200 with the rendered page.
@@ -241,7 +241,7 @@ Full DDL: see `Y0-schema.md` §tasks table.
 
 **On success (no tasks match):**
 - HTTP 200 with rendered HTML task list page.
-- Empty state message displayed: `"No tasks found."` (unfiltered) or `"No tasks with status '[Status Label]'."` (filtered).
+- Empty state message displayed: `"No tasks yet. Create your first task to get started."` (unfiltered) or `"No tasks with status '[Status Label]'. Try a different filter or create a new task."` (filtered).
 - Filter controls still rendered.
 - "New Task" button/link still rendered.
 
@@ -369,9 +369,15 @@ Full DDL: see `Y0-schema.md` §tasks table.
 ### Validation Rules
 
 - `title`: Same as F00 — non-empty after trim, ≤ 255 characters.
-- `status`: Must be one of `To Do`, `In Progress`, `Done`. Cannot be empty (edit form always has a selected value in the dropdown).
+- `status`: Must be one of `To Do`, `In Progress`, `Done`. Cannot be empty or invalid on edit — the edit form always has a pre-populated value from the stored task record, so a missing/invalid submitted value indicates a form submission problem. **Design rationale:** Unlike creation (F00) where a missing status silently defaults to `To Do`, on edit a missing/invalid status must be flagged as an error to prevent silently overwriting the task's existing status with an unintended default. See F00 §Validation for the creation counterpart.
 - `due_date`: If provided and non-empty, must be a valid `YYYY-MM-DD` calendar date. Empty string treated as NULL (clear the due date).
 - `:id`: Must be a positive integer. Must reference an existing `tasks` row.
+
+### Concurrent Edit Behavior
+
+**v1 behavior: last-write-wins with no conflict detection and no warning shown to the user.**
+
+If two team members open the edit form for the same task at the same time and both submit, the second save will silently overwrite the first. This is accepted behavior for v1 given the small team size (2–15 people) and low probability of simultaneous edits. Implementers must NOT add optimistic locking, `updated_at` comparison on submit, conflict detection UI, or any warning message for this scenario. Optimistic locking is a v2 candidate (see PRD §8 Risks).
 
 ---
 
@@ -839,8 +845,8 @@ The following columns/tables are candidates for v2+ but must NOT be added in v1:
 | 1 | `GET` | `/tasks` | F01, F05 | Task list view (optionally filtered) |
 | 2 | `GET` | `/tasks/new` | F00 | Task creation form |
 | 3 | `POST` | `/tasks` | F00 | Create new task |
-| 4 | `GET` | `/tasks/:id` | F01, F02 | Task detail view (read-only) |
-| 5 | `GET` | `/tasks/:id/edit` | F02 | Task edit form |
+| 4 | `GET` | `/tasks/:id` | F01, F02 | Task detail — redirects to `GET /tasks/:id/edit` (the edit form serves as the combined detail/edit view; no separate read-only detail page exists in v1) |
+| 5 | `GET` | `/tasks/:id/edit` | F02 | Task edit form (primary task detail and edit surface) |
 | 6 | `PUT` | `/tasks/:id` | F02 | Update task |
 | 7 | `POST` | `/tasks/:id` | F02 | Update task (HTML method override via `_method=PUT`) |
 | 8 | `DELETE` | `/tasks/:id` | F03 | Delete task |
@@ -917,7 +923,7 @@ The following columns/tables are candidates for v2+ but must NOT be added in v1:
 
 #### `GET /tasks/:id`
 
-**Description:** Returns the detail view for a single task (read-only).
+**Description:** Redirects to the task edit form. In v1, the edit form (`GET /tasks/:id/edit`) serves as the combined task detail and edit surface. There is no separate read-only detail page; task row clicks navigate directly to the edit form.
 
 **Path Parameters:**
 
@@ -929,7 +935,7 @@ The following columns/tables are candidates for v2+ but must NOT be added in v1:
 
 | Status | Condition | Body |
 |--------|-----------|------|
-| 200 | Task found | HTML task detail page |
+| 302 | Task found | Redirect to `GET /tasks/:id/edit` |
 | 404 | Task not found | HTML 404 error page |
 | 400 | `:id` not a positive integer | HTML 400 error page |
 

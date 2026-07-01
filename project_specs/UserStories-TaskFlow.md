@@ -103,8 +103,8 @@
 
 **Acceptance Criteria:**
 - [ ] Each task row's title is a clickable link
-- [ ] Clicking a task row navigates to `GET /tasks/:id` or `GET /tasks/:id/edit`
-- [ ] The linked page shows the full task details (title, description, status, due date)
+- [ ] Clicking a task row navigates to `GET /tasks/:id/edit` (the pre-populated edit form serves as the task detail view)
+- [ ] The linked page shows the full task details (title, description, status, due date) pre-populated in the edit form
 - [ ] The navigation completes without error for any valid task ID
 
 **Priority:** P0 | **Feature Ref:** F1
