@@ -27,7 +27,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Running the migration command creates the `tasks` table with all required columns and indexes
   3. The app connects to both PostgreSQL (production) and SQLite (development) via `DATABASE_URL` alone — no code changes required
   4. Stopping and restarting the server does not affect data already in the database
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold: npm init, Express app, middleware, stub routes, error templates
+- [ ] 01-02-PLAN.md — Database layer: Sequelize config, Task model (exact DDL), versioned migration
 
 ### Phase 2: Core CRUD
 **Goal**: Team members can fully manage tasks — create, view, edit, and delete — with all changes persisted across restarts
@@ -58,6 +62,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/2 | Not started | - |
 | 2. Core CRUD | 0/? | Not started | - |
 | 3. Status Filtering | 0/? | Not started | - |
